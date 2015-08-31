@@ -1,0 +1,20 @@
+#### AD/DEFAULTS.YAML --- Default settings for active-directory-formula
+
+ad:
+  ds:
+    domain: example.net         # Kerberos 5 realm (DNS domain name)
+    netbios: EXAMPLE            # NetBIOS domain name
+    mode:                       # domain and forest functionality levels
+      domain: Win2012R2
+      forest: Win2012R2
+    path:
+      database: 'C:\Windows\NTDS'
+      log: 'C:\Windows\NTDS'
+      sysvol: 'C:\Windows\SYSVOL'
+    rm:
+      password: 'P@55w0rd!!'    # local admin password for DS Restore Mode
+    credentials:                # domain credentials used to deploy replica DCs
+      username: 'EXAMPLE\s-salt-master'
+      password: 'P@55w0rd!!'
+
+#### AD/DEFAULTS.YAML ends here.
