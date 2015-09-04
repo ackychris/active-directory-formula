@@ -11,7 +11,7 @@ w32time:
   ## Set the list of NTP servers with which to synchronize
   ## (https://technet.microsoft.com/en-us/library/cc779560.aspx).
   ntp_peers:
-    - time.windows.com,0x1
+    - time.windows.com,0x9
 
   ## Set how often a manually controlled time source is polled
   ## (https://technet.microsoft.com/en-us/library/cc756830.aspx,
