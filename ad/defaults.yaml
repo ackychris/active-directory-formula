@@ -18,6 +18,15 @@ ad:
     ## Set the Administrator account password for DS Restore Mode.
     rm_password: 'P@55w0rd!!'
 
+    ## Configure an authoritative time server per KB816042.
+    authoritative_time: False
+    announce_flag: 0x5
+    ntp_peers:                  # https://technet.microsoft.com/en-us/library/cc779560.aspx
+      - time.windows.com,0x1
+    special_poll_interval: 900
+    max_pos_phase_correction: 1800
+    max_neg_phase_correction: 1800
+
     ## CAUTION: Domain credentials used to deploy replica DCs must be
     ## specified by the system operator.
     credentials:
