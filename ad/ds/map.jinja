@@ -1,14 +1,28 @@
 {% import_yaml "ad/defaults.yaml" as default_settings %}
 
-{% set release_map = salt['grains.filter_by']({
-    'default': {
-      'features': [ 'AD-Domain-Services', 'DNS', 'RSAT-AD-Tools',
-                    'RSAT-ADDS', 'RSAT-ADDS-Tools', 'RSAT-AD-AdminCenter',
-                    'RSAT-AD-PowerShell', 'RSAT-DNS-Server', ],
-      'services': [ 'DNS', 'NTDS', 'W32Time', ],
-    },
+{% set os_release_map = salt['grains.filter_by']({
+    'default':
+      {
+        'features':
+          [
+            'AD-Domain-Services',
+            'DNS',
+            'RSAT-AD-Tools',
+            'RSAT-ADDS',
+            'RSAT-ADDS-Tools',
+            'RSAT-AD-AdminCenter',
+            'RSAT-AD-PowerShell',
+            'RSAT-DNS-Server',
+          ],
+        'services':
+          [
+            'DNS',
+            'NTDS',
+            'W32Time',
+          ],
+      },
   }, grains='osrelease', merge=salt['pillar.get']('ad:ds:lookup')) %}
 
-{% do default_settings.ad.ds.update(release_map) %}
+{% do default_settings.ad.ds.update(os_release_map) %}
 
 {% set ad_ds_settings = salt['pillar.get']('ad:ds', default=default_settings.ad.ds, merge=True) %}
