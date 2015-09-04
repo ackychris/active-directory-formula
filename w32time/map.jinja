@@ -1,0 +1,10 @@
+{% import_yaml "w32time/defaults.yaml" as default_settings %}
+
+## placeholder
+{% set os_release_map = salt['grains.filter_by']({
+    'default': {},
+  }, grains='osrelease', merge=salt['pillar.get']('w32time:lookup')) %}
+
+{% do default_settings.w32time.update(os_release_map) %}
+
+{% set w32time_settings = salt['pillar.get']('w32time', default=default_settings.w32time, merge=True) %}

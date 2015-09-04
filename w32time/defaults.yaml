@@ -1,0 +1,25 @@
+#### W32TIME/DEFAULTS.YAML --- Default settings for active-directory-formula
+
+w32time:
+  ## Configure an authoritative time server per KB816042.
+  authoritative: False
+
+  ## Force advertising a reliable time service
+  ## (https://technet.microsoft.com/en-us/library/cc784191.aspx).
+  announce_flag: 0x5
+
+  ## Set the list of NTP servers with which to synchronize
+  ## (https://technet.microsoft.com/en-us/library/cc779560.aspx).
+  ntp_peers:
+    - time.windows.com,0x1
+
+  ## Set how often a manually controlled time source is polled
+  ## (https://technet.microsoft.com/en-us/library/cc756830.aspx,
+  ## https://technet.microsoft.com/en-us/library/cc779560.aspx).
+  special_poll_interval: 900
+
+  ## Limit corrections to at most +/- 30 minutes.
+  max_pos_phase_correction: 1800
+  max_neg_phase_correction: 1800
+
+#### W32TIME/DEFAULTS.YAML ends here.
