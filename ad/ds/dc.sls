@@ -5,7 +5,7 @@ ad_ds_replica_dc:
     - names: {{ ad_ds_settings.features|yaml }}
   cmd.run:
     - shell: powershell
-    - name: 'Import-Module ADDSDeployment; $Credentials = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList {{ ad_ds_settings.credentials.username }}, (ConvertTo-SecureString -String "{{ ad_ds_settings.credentials.password }}" -AsPlainText -Force); Install-ADDSDomainController -ADPrepCredential $Credentials -ApplicationPartitionsToReplicate "*" -CreateDnsDelegation:$true -Credential $Credentials -DnsDelegationCredential $Credentials -DomainName "{{ ad_ds_settings.domain }}" -InstallDns:$true -LogPath "{{ ad_ds_settings.path.log }}" -SafeModeAdministratorPassword (ConvertTo-SecureString -String "{{ ad_ds_settings.rm.password }}" -AsPlainText -Force) -SysvolPath "{{ ad_ds_settings.path.sysvol }}" -NoRebootOnCompletion:$true -Force:$true'
-    - creates: '{{ ad_ds_settings.path.database }}'
+    - name: 'Import-Module ADDSDeployment; $Credentials = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList {{ ad_ds_settings.credentials.username }}, (ConvertTo-SecureString -String "{{ ad_ds_settings.credentials.password }}" -AsPlainText -Force); Install-ADDSDomainController -ADPrepCredential $Credentials -ApplicationPartitionsToReplicate "*" -CreateDnsDelegation:$true -Credential $Credentials -DnsDelegationCredential $Credentials -DomainName "{{ ad_ds_settings.domain }}" -InstallDns:$true -LogPath "{{ ad_ds_settings.log }}" -SafeModeAdministratorPassword (ConvertTo-SecureString -String "{{ ad_ds_settings.rm_password }}" -AsPlainText -Force) -SysvolPath "{{ ad_ds_settings.sysvol }}" -NoRebootOnCompletion:$true -Force:$true'
+    - creates: '{{ ad_ds_settings.database }}'
     - require:
         - win_servermanager: ad_ds_replica_dc
