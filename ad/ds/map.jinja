@@ -5,7 +5,7 @@
     '2008ServerR2': {},
     '2012Server': {},
     '2012ServerR2': {},
-  }, grains='osrelease', merge=salt['pillar.get']('ad:ds:lookup')) %}
+  }, grain='osrelease', merge=salt['pillar.get']('ad:ds:lookup')) %}
 
 {% do default_settings.ad.ds.update(os_release_map) %}
 
