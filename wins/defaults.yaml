@@ -1,0 +1,8 @@
+wins:
+  features:
+    - WINS
+    - RSAT-WINS
+  services:
+    - WINS
+  partners:
+    []
