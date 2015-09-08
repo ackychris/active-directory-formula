@@ -26,24 +26,24 @@
 {% set command = [ 'Import-Module ADDSDeployment;' ] %}
 {% set operation = sls.split('.')[2] %}
 {% if operation == 'forest' %}
-  {% do install_command.append('Install-ADDSForest') %}
+  {% do command.append('Install-ADDSForest') %}
 {% elif operation == 'domain ' %}
-  {% do install_command.append('Install-ADDSDomain') %}
+  {% do command.append('Install-ADDSDomain') %}
 {% elif operation in [ 'dc', 'rodc' ] %}
   {% if operation == 'rodc' %}
-    {% do install_command.append('Add-ADDSReadOnlyDomainControllerAccount') %}
+    {% do command.append('Add-ADDSReadOnlyDomainControllerAccount') %}
     {% call(options) process_options('rodc') %}
-      {% do install_command.extend(options) %}
+      {% do command.extend(options) %}
     {% endcall %}
-    {% do install_command.append(';') %}
+    {% do command.append(';') %}
   {% endif %}
-  {% do install_command.append('Install-ADDSDomainController') %}
+  {% do command.append('Install-ADDSDomainController') %}
 {% endif %}
 {% call(options) process_options(operation) %}
-  {% do install_command.extend(options) %}
+  {% do command.extend(options) %}
 {% endcall %}
 {% call(options) process_options('common') %}
-  {% do install_command.extend(options) %}
+  {% do command.extend(options) %}
 {% endcall %}
 {% do command.append('-Force:$true -NoRebootOnCompletion:$true') %}
 
