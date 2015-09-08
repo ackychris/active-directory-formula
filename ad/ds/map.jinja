@@ -1,26 +1,10 @@
+{% import_yaml "ad/ds/knobs.yaml" as ad_ds_knobs %}
 {% import_yaml "ad/ds/defaults.yaml" as default_settings %}
 
 {% set os_release_map = salt['grains.filter_by']({
-    'default':
-      {
-        'features':
-          [
-            'AD-Domain-Services',
-            'DNS',
-            'RSAT-AD-Tools',
-            'RSAT-ADDS',
-            'RSAT-ADDS-Tools',
-            'RSAT-AD-AdminCenter',
-            'RSAT-AD-PowerShell',
-            'RSAT-DNS-Server',
-          ],
-        'services':
-          [
-            'DNS',
-            'NTDS',
-            'W32Time',
-          ],
-      },
+    '2008ServerR2': {},
+    '2012Server': {},
+    '2012ServerR2': {},
   }, grains='osrelease', merge=salt['pillar.get']('ad:ds:lookup')) %}
 
 {% do default_settings.ad.ds.update(os_release_map) %}

@@ -2,26 +2,20 @@
 
 ad:
   ds:
-    domain: example.net         # Kerberos 5 realm (DNS domain name)
-    netbios: EXAMPLE            # NetBIOS domain name
-
-    ## Specify the domain and forest functionality levels.
-    domain_mode: Win2012R2
-    forest_mode: Win2012R2
-
-    ## Specify where to install the NTDS database, transaction log,
-    ## and SYSVOL shared folder.
-    database: 'C:\Windows\NTDS'
-    log: 'C:\Windows\NTDS'
-    sysvol: 'C:\Windows\SYSVOL'
-
-    ## Set the Administrator account password for DS Restore Mode.
-    rm_password: 'P@55w0rd!!'
-
-    ## CAUTION: Domain credentials used to deploy replica DCs must be
-    ## specified by the system operator.
-    credentials:
-      username: ''              # e.g., 'EXAMPLE\s-salt-master'
-      password: ''              # e.g., 'P@55w0rd!!'
+    features:
+      - AD-Domain-Services
+      - DNS
+      - RSAT-AD-Tools
+      - RSAT-ADDS
+      - RSAT-AD-AdminCenter
+      - RSAT-AD-PowerShell
+      - RSAT-DNS-Server
+    services:
+      - DNS
+      - NTDS
+      - w32time
+    DatabasePath: 'C:\Windows\NTDS'
+    LogPath: 'C:\Windows\NTDS'
+    SysvolPath: 'C:\Windows\SYSVOL'
 
 #### AD/DS/DEFAULTS.YAML ends here.

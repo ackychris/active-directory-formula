@@ -1,0 +1,60 @@
+common:
+  CreateDnsDelegation:           boolean
+  DatabasePath:                  literal
+  DnsDelegationCredential:       pscredential
+  InstallDns:                    boolean
+  LogPath:                       literal
+  NoDnsOnNetwork:                boolean
+  SafeModeAdministratorPassword: secure-string
+  SkipAutoConfigureDns:          boolean
+  SkipPreChecks:                 boolean
+  SysvolPath:                    literal
+
+forest:
+  DomainMode:        literal
+  DomainName:        literal
+  DomainNetbiosName: literal
+  ForestMode:        literal
+
+domain:
+  ADPrepCredential:     pscredential
+  AllowDomainReinstall: boolean
+  Credential:           pscredential
+  DomainMode:           literal
+  DomainType:           literal
+  NewDomainName:        literal
+  NewDomainNetbiosName: literal
+  NoGlobalCatalog:      boolean
+  ReplicationSourceDC:  literal
+  SiteName:             literal
+
+dc:
+  ADPrepCredential:                    pscredential
+  AllowDomainControllerReinstall:      boolean
+  AllowPasswordReplicationAccountName: literal
+  ApplicationPartitionsToReplicate:    literal
+  Credential:                          pscredential
+  CriticalReplicationOnly:             boolean
+  DelegatedAdministratorAccountName:   literal
+  DenyPasswordReplicationAccountName:  literal
+  DomainName:                          literal
+  InstallationMediaPath:               literal
+  MoveInfrastructureOperationMasterRoleIfNecessary: boolean
+  NoGlobalCatalog:                     boolean
+  ReadOnlyReplica:                     boolean
+  SiteName:                            literal
+  SystemKey:                           secure-string
+  UseExistingAccount:                  boolean
+
+rodc:
+  AllowPasswordReplicationAccountName: literal
+  Credential:                          pscredential
+  DelegatedAdministratorAccountName:   literal
+  DenyPasswordReplicationAccountName:  literal
+  DomainControllerAccountName:         literal
+  DomainName:                          literal
+  InstallDns:                          boolean
+  NoGlobalCatalog:                     boolean
+  ReplicationSourceDC:                 literal
+  SiteName:                            literal
+  SkipPreChecks:                       boolean
