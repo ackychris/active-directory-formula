@@ -1,5 +1,5 @@
 common:
-  CreateDnsDelegation:           boolean
+  CreateDNSDelegation:           boolean
   DatabasePath:                  literal
   DnsDelegationCredential:       pscredential
   InstallDns:                    boolean
