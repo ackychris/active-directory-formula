@@ -13,7 +13,7 @@ common:
 forest:
   DomainMode:        literal
   DomainName:        literal
-  DomainNetbiosName: literal
+  DomainNetBiosName: literal
   ForestMode:        literal
 
 domain:
@@ -23,7 +23,7 @@ domain:
   DomainMode:           literal
   DomainType:           literal
   NewDomainName:        literal
-  NewDomainNetbiosName: literal
+  NewDomainNetBiosName: literal
   NoGlobalCatalog:      boolean
   ReplicationSourceDC:  literal
   SiteName:             literal
