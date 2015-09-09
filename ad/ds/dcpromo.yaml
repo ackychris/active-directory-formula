@@ -51,17 +51,17 @@ CreateDCAccount:
 
 UseExistingAccount:
   ApplicationPartitionsToReplicate: literal
-  CriticalReplicationOnly:	    boolean
-  DatabasePath:			    literal
-  DNSOnNetwork:			    boolean
-  LogPath:			    literal
-  Password:			    literal
-  ReplicaDomainDNSName:		    literal
-  ReplicationSourceDC:		    literal
-  ReplicationSourcePath:	    literal
-  SafeModeAdminPassword:	    literal
-  SkipAutoConfigDns:		    flag
-  Syskey:			    literal
-  SysVolPath:			    literal
-  UserDomain:			    literal
-  UserName:			    literal
+  CriticalReplicationOnly:          boolean
+  DatabasePath:                     literal
+  DNSOnNetwork:                     boolean
+  LogPath:                          literal
+  Password:                         literal
+  ReplicaDomainDNSName:             literal
+  ReplicationSourceDC:              literal
+  ReplicationSourcePath:            literal
+  SafeModeAdminPassword:            literal
+  SkipAutoConfigDns:                flag
+  Syskey:                           literal
+  SysVolPath:                       literal
+  UserDomain:                       literal
+  UserName:                         literal
