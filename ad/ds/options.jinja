@@ -1,0 +1,94 @@
+{% from "ad/ds/map.jinja" import ad_ds_settings with context %}
+{% import_yaml "ad/ds/knobs.yaml" as adds_knobs %}
+{% import_yaml "ad/ds/dcpromo.yaml" as dcpromo_knobs %}
+
+{% macro process_dcoptions(operation) %}
+  {% set retval = [] %}
+  {% for variable, type in dcpromo_knobs[operation].items() %}
+    {% if variable in ad_ds_settings %}
+      {% set value = ad_ds_settings[variable] %}
+      {% if type == 'flag' and value %}
+	{% do retval.append('/%s'|format(variable)) %}
+      {% elif value is boolean %}
+	{% do retval.append('/%s:%s'|format(variable, "Yes" if value else "No")) %}
+      {% elif value is sequence and value is not string %}
+	{% do retval.append('/%s:%s'|format(variable, value|join(' '))) %}
+      {% else %}
+	{% do retval.append('/%s:%s'|format(variable, value)) %}
+      {% endif %}
+    {% endif %}
+  {% endfor %}
+  {% do caller(retval) %}
+{% endmacro %}
+
+{% macro process_psoptions(operation) %}
+  {% set retval = [] %}
+  {% for variable, type in adds_knobs[operation].items() %}
+    {% if variable in ad_ds_settings %}
+      {% set value = ad_ds_settings[variable] %}
+      {% if type == 'boolean' %}
+        {% do retval.append('-%s:$%s'|format(variable, value)) %}
+      {% elif type == 'literal' %}
+        {% if value is sequence and value is not string %}
+          {% do retval.append('-%s %s'|format(variable, value|join(' '))) %}
+        {% else %}
+          {% do retval.append('-%s %s'|format(variable, value)) %}
+        {% endif %}
+      {% elif type == 'secure-string' %}
+        {% do retval.append('-%s (ConvertTo-SecureString -String "%s" -AsPlainText -Force)'|format(variable, value)) %}
+      {% elif type == 'pscredential' %}
+        {% do retval.append('-%s (New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList "%s", (ConvertTo-SecureString -String "%s" -AsPlainText -Force))'|format(variable, value.username, value.password)) %}
+      {% endif %}
+    {% endif %}
+  {% endfor %}
+  {% do caller(retval) %}
+{% endmacro %}
+
+{% macro generate_promotion_command(operation) %}
+  {% set command = [] %}
+  {% if salt['grains.get']('osrelease') in [ '2003Server', '2003ServerR2', '2008Server', '2008ServerR2' ] %}
+    {% do command.append('dcpromo /unattend') %}
+    {% if operation in [ 'forest', 'tree', 'child' ] %}
+      {% do command.append('/NewDomain:%s'|format(operation.title())) %}
+      {% do command.append('/ReplicaOrNewDomain:Domain') %}
+    {% elif operation == 'dc' %}
+      {% do command.append('/ReplicaOrNewDomain:Replica') %}
+    {% elif operation == 'rodc' %}
+      {% do command.append('/CreateDCAccount') %}
+      {% call(options) process_dcoptions('CreateDCAccount') %}
+	{% do command.extend(options) %}
+      {% endcall %}
+      {% do command.append(';') %}
+      {% do command.append('dcpromo /unattend') %}
+      {% do command.append('/ReplicaOrNewDomain:ReadOnlyReplica') %}
+    {% endif %}
+    {% call(options) process_dcoptions('Promotion') %}
+      {% do command.extend(options) %}
+    {% endcall %}
+    {% do command.append('/RebootOnCompletion:No /RebootOnSuccess:NoAndNoPromptEither') %}
+  {% elif salt['grains.get']('osrelease') in [ '2012Server', '2012ServerR2' ] %}
+    {% do command.append('Import-Module ADDSDeployment;') %}
+    {% if operation == 'forest' %}
+      {% do command.append('Install-ADDSForest') %}
+    {% elif operation == 'domain ' %}
+      {% do command.append('Install-ADDSDomain') %}
+    {% elif operation in [ 'dc', 'rodc' ] %}
+      {% if operation == 'rodc' %}
+	{% do command.append('Add-ADDSReadOnlyDomainControllerAccount') %}
+	{% call(options) process_psoptions('rodc') %}
+	  {% do command.extend(options) %}
+	{% endcall %}
+	{% do command.append(';') %}
+      {% endif %}
+      {% do command.append('Install-ADDSDomainController') %}
+    {% endif %}
+    {% call(options) process_psoptions(operation) %}
+      {% do command.extend(options) %}
+    {% endcall %}
+    {% call(options) process_psoptions('common') %}
+      {% do command.extend(options) %}
+    {% endcall %}
+    {% do command.append('-Force:$true -NoRebootOnCompletion:$true') %}
+  {% endif %}
+  {% do caller(command|join(' ')) %}
+{% endmacro %}

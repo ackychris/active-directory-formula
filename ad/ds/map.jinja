@@ -1,7 +1,9 @@
-{% import_yaml "ad/ds/knobs.yaml" as ad_ds_knobs %}
 {% import_yaml "ad/ds/defaults.yaml" as default_settings %}
 
 {% set os_release_map = salt['grains.filter_by']({
+    '2003Server': {},
+    '2003ServerR2': {},
+    '2008Server': {},
     '2008ServerR2': {},
     '2012Server': {},
     '2012ServerR2': {},
