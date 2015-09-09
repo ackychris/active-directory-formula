@@ -9,7 +9,7 @@
       {% set value = ad_ds_settings[variable] %}
       {% if type == 'flag' and value %}
 	{% do retval.append('/%s'|format(variable)) %}
-      {% elif value is boolean %}
+      {% elif value == True or value == False %}
 	{% do retval.append('/%s:%s'|format(variable, "Yes" if value else "No")) %}
       {% elif value is sequence and value is not string %}
 	{% do retval.append('/%s:%s'|format(variable, value|join(' '))) %}
