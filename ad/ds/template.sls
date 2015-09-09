@@ -6,7 +6,7 @@ include:
   - ad.ds.services
 
 {% set operation = sls.split('.')[2] %}
-{% call(command) generation_promotion_command(operation) %}
+{% call(command) generate_promotion_command(operation) %}
 ad_ds_install:
   cmd.run:
     - shell: powershell
