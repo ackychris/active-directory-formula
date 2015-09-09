@@ -8,13 +8,13 @@
     {% if variable in ad_ds_settings %}
       {% set value = ad_ds_settings[variable] %}
       {% if type == 'flag' and value %}
-	{% do retval.append('/%s'|format(variable)) %}
+        {% do retval.append('/%s'|format(variable)) %}
       {% elif value == True or value == False %}
-	{% do retval.append('/%s:%s'|format(variable, "Yes" if value else "No")) %}
+        {% do retval.append('/%s:%s'|format(variable, "Yes" if value else "No")) %}
       {% elif value is sequence and value is not string %}
-	{% do retval.append('/%s:%s'|format(variable, value|join(' '))) %}
+        {% do retval.append('/%s:%s'|format(variable, value|join(' '))) %}
       {% else %}
-	{% do retval.append('/%s:%s'|format(variable, value)) %}
+        {% do retval.append('/%s:%s'|format(variable, value)) %}
       {% endif %}
     {% endif %}
   {% endfor %}
@@ -56,7 +56,7 @@
     {% elif operation == 'rodc' %}
       {% do command.append('/CreateDCAccount') %}
       {% call(options) process_dcoptions('CreateDCAccount') %}
-	{% do command.extend(options) %}
+        {% do command.extend(options) %}
       {% endcall %}
       {% do command.append(';') %}
       {% do command.append('dcpromo /unattend') %}
@@ -74,11 +74,11 @@
       {% do command.append('Install-ADDSDomain') %}
     {% elif operation in [ 'dc', 'rodc' ] %}
       {% if operation == 'rodc' %}
-	{% do command.append('Add-ADDSReadOnlyDomainControllerAccount') %}
-	{% call(options) process_psoptions('rodc') %}
-	  {% do command.extend(options) %}
-	{% endcall %}
-	{% do command.append(';') %}
+        {% do command.append('Add-ADDSReadOnlyDomainControllerAccount') %}
+        {% call(options) process_psoptions('rodc') %}
+          {% do command.extend(options) %}
+        {% endcall %}
+        {% do command.append(';') %}
       {% endif %}
       {% do command.append('Install-ADDSDomainController') %}
     {% endif %}
