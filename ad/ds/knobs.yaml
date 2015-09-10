@@ -1,3 +1,5 @@
+## https://technet.microsoft.com/en-us/library/hh974719.aspx
+
 common:
   CreateDNSDelegation:           boolean
   DatabasePath:                  literal
@@ -58,3 +60,71 @@ rodc:
   ReplicationSourceDC:                 literal
   SiteName:                            literal
   SkipPreChecks:                       boolean
+
+## https://technet.microsoft.com/en-us/library/cc732887.aspx
+
+Promotion:
+  AllowDomainControllerReinstall:   boolean
+  AllowDomainReinstall:             boolean
+  ApplicationPartitionsToReplicate: literal
+  ChildName:                        literal
+  ConfirmGc:                        boolean
+  CreateDNSDelegation:              boolean
+  CriticalReplicationOnly:          boolean
+  DatabasePath:                     literal
+  DelegatedAdmin:                   literal
+  DNSDelegationPassword:            literal
+  DNSDelegationUserName:            literal
+  DNSOnNetwork:                     literal
+  DomainLevel:                      literal
+  DomainNetBiosName:                literal
+  ForestLevel:                      literal
+  InstallDNS:                       boolean
+  LogPath:                          literal
+  NewDomainDNSName:                 literal
+  ParentDomainDNSName:              literal
+  Password:                         literal
+  PasswordReplicationAllowed:       literal
+  PasswordReplicationDenied:        literal
+  ReplicaDomainDNSName:             literal
+  ReplicationSourceDC:              literal
+  ReplicationSourcePath:            literal
+  SafeModeAdminPassword:            literal
+  SiteName:                         literal
+  SkipAutoConfigDns:                flag
+  Syskey:                           literal
+  SysVolPath:                       literal
+  TransferIMRoleIfNecessary:        boolean
+  UserDomain:                       literal
+  UserName:                         literal
+
+CreateDCAccount:
+  ConfirmGc:                        boolean
+  DCAccountName:                    boolean
+  DelegatedAdmin:                   literal
+  InstallDNS:                       boolean
+  Password:                         literal
+  PasswordReplicationAllowed:       literal
+  PasswordReplicationDenied:        literal
+  ReplicaDomainDNSName:             literal
+  ReplicationSourceDC:              literal
+  SiteName:                         literal
+  UserDomain:                       literal
+  UserName:                         literal
+
+UseExistingAccount:
+  ApplicationPartitionsToReplicate: literal
+  CriticalReplicationOnly:          boolean
+  DatabasePath:                     literal
+  DNSOnNetwork:                     boolean
+  LogPath:                          literal
+  Password:                         literal
+  ReplicaDomainDNSName:             literal
+  ReplicationSourceDC:              literal
+  ReplicationSourcePath:            literal
+  SafeModeAdminPassword:            literal
+  SkipAutoConfigDns:                flag
+  Syskey:                           literal
+  SysVolPath:                       literal
+  UserDomain:                       literal
+  UserName:                         literal
