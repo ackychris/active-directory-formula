@@ -1,0 +1,131 @@
+#### PILLAR.EXAMPLE --- Example Pillar key-value pairs used by this formula
+
+### Copyright (c) 2015, Matthew X. Economou <xenophon@irtnog.org>
+###
+### Permission to use, copy, modify, and/or distribute this software
+### for any purpose with or without fee is hereby granted, provided
+### that the above copyright notice and this permission notice appear
+### in all copies.
+###
+### THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL
+### WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED
+### WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE
+### AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR
+### CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
+### LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT,
+### NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN
+### CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+
+### This file describes a few of the possible options this formula can
+### use to customize its behavior.  The key words "MUST", "MUST NOT",
+### "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT",
+### "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be
+### interpreted as described in RFC 2119,
+### http://www.rfc-editor.org/rfc/rfc2119.txt.  The keywords "DANGER",
+### "WARNING", and "CAUTION" in this document are to be interpreted as
+### described in OSHA 1910.145,
+### https://www.osha.gov/pls/oshaweb/owadisp.show_document?p_table=standards&p_id=9794.
+
+####
+#### ACTIVE DIRECTORY CERTIFICATE SERVICES (AD CS)
+####
+
+## TODO
+
+####
+#### ACTIVE DIRECTORY DOMAIN SERVICES (AD DS)
+####
+
+### CAUTION: Pillar keys used by the AD DS state modules are case
+### sensitive and MUST match the knobs listed in *ad/ds/knobs.yaml*.
+
+## To deploy a new AD forest using a Windows Server 2008 R2 domain
+## controller, use the following settings along with the
+## `ad.ds.forest` state module.  Prior to running this module,
+## manually configure the target computer's network interfaces, as
+## domain controllers SHOULD NOT be configured using DHCP.
+ad:
+  ds:
+    ## options get passed to DCPROMO verbatim
+    NewDomainDNSName: example.com
+    DomainNetBiosName: EXAMPLE
+    InstallDNS: yes             # we DTRT with booleans
+    DNSOnNetwork: 'yes'         # this is OK, too
+    SafeModeAdminPassword: '@ssw0rd-Pay'
+    ## escape first for Powershell (inner double quotes), second for
+    ## YAML (outer single quotes)
+    DatabasePath: '"C:\Active Directory\Database"'
+
+## TODO: more examples
+
+####
+#### ACTIVE DIRECTORY FEDERATION SERVICES (AD FS)
+####
+
+## TODO
+
+####
+#### ACTIVE DIRECTORY LIGHTWEIGHT DIRECTORY SERVICES (AD LDS)
+####
+
+## TODO
+
+####
+#### ACTIVE DIRECTORY RIGHTS MANAGEMENT SERVICES (AD RMS)
+####
+
+## TODO
+
+####
+#### DOMAIN NAME SERVER (DNS)
+####
+
+## TODO
+
+####
+#### WINDOWS TIME (W32TIME)
+####
+
+w32time:
+  ## Salt performs case-sensitive matches on service names.
+  ## Re-installing the Windows Time service via `w32tm
+  ## /unregister`/`w32tm /register` results in an all lower case
+  ## service name.  Override the state module's default as shown.
+  services:
+    - w32time
+
+  ## Configure an authoritative time server per KB816042.  If set to
+  ## `False`, the state module will revert to the default
+  ## configuration described in that article.  For additional
+  ## information please refer to ["Parameters\W32Time" on
+  ## TechNet](https://technet.microsoft.com/en-us/library/cc778879.aspx).
+  authoritative: True
+  announce_flag: 0x5
+  ntp_peers:
+    - 0.us.pool.ntp.org,0x8
+    - 1.us.pool.ntp.org,0x8
+    - 2.us.pool.ntp.org,0x8
+    - 3.us.pool.ntp.org,0x8
+  special_poll_interval: 900    # only used if flag 0x1 is set
+  max_pos_phase_correction: 1800
+  max_neg_phase_correction: 1800
+
+####
+#### WINDOWS INTERNET NAME SERVICE (WINS)
+####
+
+### For now the `wins` state module only sets up a full mesh,
+### push/pull replication topology with all listed partners.  The
+### formula is smart enough to filter out the target computer's own IP
+### address from the replication partner list.
+
+wins:
+  partners:
+    - 192.0.2.100
+    - 192.0.2.200
+
+#### Local Variables:
+#### mode: yaml
+#### End:
+
+#### PILLAR.EXAMPLE ends here.
