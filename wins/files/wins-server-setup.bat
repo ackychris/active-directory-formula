@@ -17,12 +17,10 @@ netsh wins server \\{{ servername }} set burstparam state=1 value=500
 netsh wins server \\{{ servername }} set logparam dbchange=1 event=0
 netsh wins server \\{{ servername }} set startversion version={0,0}
 
-{%- for partner in wins_settings.partners -%}
-  {%- if partner not in salt['grains.get']('ipv4') %}
+{% for partner in wins_settings.partners if partner not in salt['grains.get']('ipv4') -%}
 netsh wins server \\{{ servername }} add partner server={{ partner }} type=0
 netsh wins server \\{{ servername }} set pullpartnerconfig state=1 server={{ partner }} start=0 interval=1800
 
 netsh wins server \\{{ servername }} add partner server={{ partner }} type=1
 netsh wins server \\{{ servername }} set pushpartnerconfig state=1 server={{ partner }} update=0
-  {% endif -%}
-{%- endfor -%}
+{%- endfor %}
