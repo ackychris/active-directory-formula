@@ -1,7 +1,7 @@
 ## https://technet.microsoft.com/en-us/library/hh974719.aspx
 
 common:
-  CreateDNSDelegation:           boolean
+  CreateDnsDelegation:           boolean
   DatabasePath:                  literal
   DnsDelegationCredential:       pscredential
   InstallDns:                    boolean
@@ -15,7 +15,7 @@ common:
 forest:
   DomainMode:        literal
   DomainName:        literal
-  DomainNetBiosName: literal
+  DomainNetbiosName: literal
   ForestMode:        literal
 
 domain:
@@ -25,7 +25,7 @@ domain:
   DomainMode:           literal
   DomainType:           literal
   NewDomainName:        literal
-  NewDomainNetBiosName: literal
+  NewDomainNetbiosName: literal
   NoGlobalCatalog:      boolean
   ReplicationSourceDC:  literal
   SiteName:             literal
