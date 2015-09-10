@@ -1,6 +1,9 @@
 #### W32TIME/DEFAULTS.YAML --- Default settings for active-directory-formula
 
 w32time:
+  services:
+    - W32Time
+
   ## Configure an authoritative time server per KB816042.
   authoritative: False
 

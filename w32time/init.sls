@@ -2,6 +2,7 @@
 
 w32time:
   service.running:
+    - names: {{ w32time_settings.services|yaml }}
     - enable: True
   cmd.wait:
     - name: w32tm /config /update
