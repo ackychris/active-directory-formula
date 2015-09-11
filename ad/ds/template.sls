@@ -1,19 +1,24 @@
 {% from "ad/ds/map.jinja" import ad_ds_settings with context %}
 {% from "ad/ds/options.jinja" import generate_promotion_command with context %}
 
-include:
-  - ad.ds.features
-  - ad.ds.services
-
 {% set operation = sls.split('.')[2] %}
 {% call(command) generate_promotion_command(operation) %}
-ad_ds_install:
+ad_ds:
+  win_servermanager.installed:
+    - names: {{ ad_ds_settings.features|yaml }}
   cmd.run:
     - shell: powershell
     - name: {{ command|yaml_encode }}
     - creates: {{ ad_ds_settings.DatabasePath|yaml_encode }}
     - require:
-        - win_servermanager: ad_ds_features
-    - watch_in:
-        - service: ad_ds_services
+        - win_servermanager: ad_ds
+  service.running:
+    {% if salt['file.directory_exists'](ad_ds_settings.DatabasePath) %}
+    - names: {{ ad_ds_settings.services|yaml }}
+    {% else %}
+    - name: eventlog            # safe no-op
+    {% endif %}
+    - enable: True
+    - require:
+        - cmd: ad_ds
 {% endcall %}
