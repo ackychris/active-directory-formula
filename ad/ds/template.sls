@@ -4,8 +4,12 @@
 {% set operation = sls.split('.')[2] %}
 {% call(command) generate_promotion_command(operation) %}
 ad_ds:
+  pkg.installed:
+    - pkgs: {{ ad_ds_settings.packages|yaml }}
   win_servermanager.installed:
     - names: {{ ad_ds_settings.features|yaml }}
+    - require:
+        - pkg: ad_ds
   cmd.run:
     - shell: powershell
     - name: {{ command|yaml_encode }}
