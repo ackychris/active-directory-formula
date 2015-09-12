@@ -16,6 +16,7 @@ ad:
       - DNS
       - NTDS
       - w32time
+    reboot_timeout: 300
     DatabasePath: 'C:\Windows\NTDS'
     LogPath: 'C:\Windows\NTDS'
     SysvolPath: 'C:\Windows\SYSVOL'
