@@ -3,7 +3,7 @@
 ## placeholder
 {% set os_release_map = salt['grains.filter_by']({
     'default': {},
-  }, grains='osrelease', merge=salt['pillar.get']('w32time:lookup')) %}
+  }, grain='osrelease', merge=salt['pillar.get']('w32time:lookup')) %}
 
 {% do default_settings.w32time.update(os_release_map) %}
 
