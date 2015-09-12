@@ -6,16 +6,10 @@ ad:
       []
     features:
       - AD-Domain-Services
-      - DNS
-      - RSAT-AD-Tools
-      - RSAT-ADDS
-      - RSAT-AD-AdminCenter
-      - RSAT-AD-PowerShell
-      - RSAT-DNS-Server
     services:
-      - DNS
       - NTDS
-      - w32time
+      - kdc
+      - Netlogon
     reboot_timeout: 300
     DatabasePath: 'C:\Windows\NTDS'
     LogPath: 'C:\Windows\NTDS'
