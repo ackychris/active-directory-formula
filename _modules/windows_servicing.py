@@ -78,7 +78,8 @@ def enable_feature(name,
                    package=None,
                    image=None,
                    sources=[]):
-    '''Enable the specified Windows feature.
+    '''
+    Enable the specified Windows feature.
 
     name
         The name of the feature (case-sensitive).
