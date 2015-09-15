@@ -21,9 +21,8 @@ def _dism(action,
     '''
     Run a DISM servicing command on the given image.
     '''
-    command='dism {0} {1} {2}'.format(
+    command='dism {0} {1}'.format(
         '/Image:{0}'.format(image) if image else '/Online',
-        ' '.join(['/Source:{0}'.format(source) for source in sources]),
         action
     )
     return __salt__['cmd.run'](command, ignore_retcode=True)
@@ -144,10 +143,11 @@ def enable_feature(name,
         ret['comment'] = 'Feature {0} already installed (pending a reboot)'.format(name)
         return ret
 
-    if package:
-        output = _dism('/Enable-Feature /FeatureName:{0} /PackageName:{1} /NoRestart'.format(name, package), image, sources)
-    else:
-        output = _dism('/Enable-Feature /FeatureName:{0} /NoRestart'.format(name), image, sources)
+    output = _dism('/Enable-Feature /FeatureName:{0} {1} {2} /NoRestart'.format(
+        name,
+        '/PackageName:{0}'.format(package) if package else '',
+        ' '.join(['/Source:{0}'.format(source) for source in sources])),
+                   image)
     if not re.search('The operation completed successfully.', output):
         ret['result'] = False
         ret['comment'] = 'Feature {0} installation failed'.format(name)
@@ -217,7 +217,7 @@ def disable_feature(name,
         ret['comment'] = 'Feature {0} already removed (pending a reboot)'.format(name)
         return ret
 
-    output = _dism('/Disable-Feature /FeatureName:{0} /NoRestart'.format(name), image, sources)
+    output = _dism('/Disable-Feature /FeatureName:{0} /NoRestart'.format(name), image)
     if not re.search('The operation completed successfully.', output):
         ret['result'] = False
         ret['comment'] = 'Feature {0} removal failed'.format(name)
