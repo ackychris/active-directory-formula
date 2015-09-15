@@ -2,7 +2,7 @@
 {% from "ad/ds/options.jinja" import generate_promotion_command with context %}
 
 {% set operation = sls.split('.')[2] %}
-{% call(command) generate_promotion_command(operation) %}
+{% call(shell, command) generate_promotion_command(operation) %}
 ad_ds:
   pkg.installed:
     - pkgs: {{ ad_ds_settings.packages|yaml }}
@@ -11,7 +11,9 @@ ad_ds:
     - require:
         - pkg: ad_ds
   cmd.run:
-    - shell: powershell
+    {% if shell %}
+    - shell: {{ shell|yaml_encode }}
+    {% endif %}
     - name: {{ command|yaml_encode }}
     - creates: {{ ad_ds_settings.DatabasePath|yaml_encode }}
     - require:
