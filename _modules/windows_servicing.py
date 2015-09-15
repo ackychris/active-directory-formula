@@ -160,3 +160,73 @@ def enable_feature(name,
         ret['pending'] = True
         ret['comment'] = 'Reboot to complete feature {0} installation'.format(name)
     return ret
+
+def disable_feature(name,
+                    image=None,
+                    keep_manifest=False):
+    '''
+    Disable the specified Windows feature.
+
+    name
+        The name of the feature (case-sensitive).
+
+        CLI Example:
+
+        .. code-block:: bash
+
+            salt -G osrelease:2008ServerR2 windows_servicing.disable_feature TelnetClient
+
+    image
+        Disable the feature in the specified offline image.  If no
+        image is specified, the feature will be disabled in the
+        running Windows installation.  Note that the path to the
+        offline image is relative to the minion, not the master.
+
+        CLI Example:
+
+        .. code-block:: bash
+
+            salt-call windows_servicing.disable_feature TelnetClient image='C:\test\offline'
+
+    keep_manifest
+        If set, remove the feature in the image without also removing
+        its manifest (only Windows 8/Windows Server 2012 and newer).
+
+        CLI Example:
+
+        .. code-block:: bash
+
+            salt-call windows_servicing.disable_feature TelnetClient keep_manifest=True
+    '''
+    ret = {'name': name,
+           'result': True,
+           'changes': {},
+           'comment': '',
+           'pending': False,
+           'dism': ''}
+    features = get_features(package, image)
+    if name not in features:
+        ret['result'] = False
+        ret['comment'] = 'Feature {0} not found'.format(name)
+        return ret
+    elif features[name]['State'] == 'Disabled':
+        ret['comment'] = 'Feature {0} already removed'.format(name)
+        return ret
+    elif features[name]['State'] == 'Disable Pending':
+        ret['pending'] = True
+        ret['comment'] = 'Feature {0} already removed (pending a reboot)'.format(name)
+        return ret
+
+    output = _dism('/Disable-Feature /FeatureName:{0} /NoRestart'.format(name), image, sources)
+    if not re.search('The operation completed successfully.', output):
+        ret['result'] = False
+        ret['comment'] = 'Feature {0} removal failed'.format(name)
+        ret['dism'] = output
+        return ret
+
+    ret['changes'] = {'windows_servicing': 'Removed feature {0}'.format(name)}
+    features = get_features(package, image)
+    if features[name]['State'] == 'Disable Pending':
+        ret['pending'] = True
+        ret['comment'] = 'Reboot to complete feature {0} removal'.format(name)
+    return ret
