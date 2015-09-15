@@ -6,7 +6,7 @@
 ad_ds:
   pkg.installed:
     - pkgs: {{ ad_ds_settings.packages|yaml }}
-  win_servermanager.installed:
+  windows_feature.enabled:
     - names: {{ ad_ds_settings.features|yaml }}
     - require:
         - pkg: ad_ds
