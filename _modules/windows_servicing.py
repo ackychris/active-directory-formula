@@ -15,12 +15,15 @@ def __virtual__():
     else:
         return False
 
-def _dism(action, image=None):
+def _dism(action,
+          image=None,
+          sources=[]):
     '''
     Run a DISM servicing command on the given image.
     '''
-    command='dism {0} {1}'.format(
+    command='dism {0} {1} {2}'.format(
         '/Image:{0}'.format(image) if image else '/Online',
+        ' '.join(['/Source:{0}'.format(source) for source in sources]),
         action
     )
     return __salt__['cmd.run'](command, ignore_retcode=True)
@@ -71,7 +74,10 @@ def get_features(package=None, image=None):
             in re.findall('Feature Name : ([^\r\n]+)\r?\nState : ([^\r\n]+)\r?\n',
                           output, re.MULTILINE)}
 
-def enable_feature(name, package=None, image=None):
+def enable_feature(name,
+                   package=None,
+                   image=None,
+                   sources=[]):
     '''Enable the specified Windows feature.
 
     name
@@ -101,14 +107,28 @@ def enable_feature(name, package=None, image=None):
 
         CLI Example:
 
-        ... code-block:: bash
+        .. code-block:: bash
 
             salt-call windows_servicing.enable_feature TelnetClient image='C:\test\offline'
+
+    sources
+        Specify a list of one or more sources to search for the
+        required files needed to enable the feature.  If you do not
+        specify a source, this will look in the default location
+        specified by Group Policy
+        (https://technet.microsoft.com/en-us/library/hh825020.aspx).
+
+        CLI Example:
+
+        .. code-block:: bash
+
+            salt-call windows_servicing.enable_feature TelnetClient sources="['d:\sources\sxs']"
     '''
     ret = {'name': name,
            'result': True,
            'changes': {},
            'comment': '',
+           'pending': False,
            'dism': ''}
     features = get_features(package, image)
     if name not in features:
@@ -119,13 +139,14 @@ def enable_feature(name, package=None, image=None):
         ret['comment'] = 'Feature {0} already installed'.format(name)
         return ret
     elif features[name]['State'] == 'Enable Pending':
+        ret['pending'] = True
         ret['comment'] = 'Feature {0} already installed (pending a reboot)'.format(name)
         return ret
 
     if package:
-        output = _dism('/Enable-Feature /FeatureName:{0} /PackageName:{1} /NoRestart'.format(name, package))
+        output = _dism('/Enable-Feature /FeatureName:{0} /PackageName:{1} /NoRestart'.format(name, package), image, sources)
     else:
-        output = _dism('/Enable-Feature /FeatureName:{0} /NoRestart'.format(name))
+        output = _dism('/Enable-Feature /FeatureName:{0} /NoRestart'.format(name), image, sources)
     if not re.search('The operation completed successfully.', output):
         ret['result'] = False
         ret['comment'] = 'Feature {0} installation failed'.format(name)
@@ -135,5 +156,6 @@ def enable_feature(name, package=None, image=None):
     ret['changes'] = {'windows_servicing': 'Installed feature {0}'.format(name)}
     features = get_features(package, image)
     if features[name]['State'] == 'Enable Pending':
+        ret['pending'] = True
         ret['comment'] = 'Reboot to complete feature {0} installation'.format(name)
     return ret
