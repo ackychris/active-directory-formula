@@ -1,10 +1,5 @@
 from __future__ import absolute_import
-import logging
 import re
-
-import salt.utils
-
-log = logging.getLogger(__name__)
 
 def __virtual__():
     '''
@@ -48,7 +43,8 @@ def get_packages(image=None):
             in re.findall('Package Identity : ([^\r\n]+)\r?\nState : ([^\r\n]+)\r?\nRelease Type : ([^\r\n]+)\r?\nInstall Time : ([^\r?\n]+)\r?\n',
                           output, re.MULTILINE)}
 
-def get_features(package=None, image=None):
+def get_features(image=None,
+                 package=None):
     '''
     Return information about all features found in a specific package
     within a specific image.  If you do not specify a package name or
@@ -74,8 +70,8 @@ def get_features(package=None, image=None):
                           output, re.MULTILINE)}
 
 def enable_feature(name,
-                   package=None,
                    image=None,
+                   package=None,
                    sources=[]):
     '''
     Enable the specified Windows feature.
@@ -89,16 +85,6 @@ def enable_feature(name,
 
             salt -G osrelease:2008ServerR2 windows_servicing.enable_feature TelnetClient
 
-    package
-        Enable the feature from the specified package.  If no package
-        name is specified, the Windows Foundation package is assumed.
-
-        CLI Example:
-
-        .. code-block:: bash
-
-            salt -G osrelease:2008ServerR2 windows_servicing.enable_feature Calc package=Microsoft.Windows.Calc.Demo~6595b6144ccf1df~x86~en~1.0.0.0
-
     image
         Enable the feature in the specified offline image.  If no
         image is specified, the feature will be enabled in the running
@@ -110,6 +96,16 @@ def enable_feature(name,
         .. code-block:: bash
 
             salt-call windows_servicing.enable_feature TelnetClient image='C:\test\offline'
+
+    package
+        Enable the feature from the specified package.  If no package
+        name is specified, the Windows Foundation package is assumed.
+
+        CLI Example:
+
+        .. code-block:: bash
+
+            salt -G osrelease:2008ServerR2 windows_servicing.enable_feature Calc package=Microsoft.Windows.Calc.Demo~6595b6144ccf1df~x86~en~1.0.0.0
 
     sources
         Specify a list of one or more sources to search for the
@@ -130,7 +126,7 @@ def enable_feature(name,
            'comment': '',
            'pending': False,
            'dism': ''}
-    features = get_features(package, image)
+    features = get_features(image, package)
     if name not in features:
         ret['result'] = False
         ret['comment'] = 'Feature {0} not found'.format(name)
@@ -155,7 +151,7 @@ def enable_feature(name,
         return ret
 
     ret['changes'] = {'windows_servicing': 'Installed feature {0}'.format(name)}
-    features = get_features(package, image)
+    features = get_features(image, package)
     if features[name]['State'] == 'Enable Pending':
         ret['pending'] = True
         ret['comment'] = 'Reboot to complete feature {0} installation'.format(name)
@@ -204,7 +200,7 @@ def disable_feature(name,
            'comment': '',
            'pending': False,
            'dism': ''}
-    features = get_features(package, image)
+    features = get_features(image)
     if name not in features:
         ret['result'] = False
         ret['comment'] = 'Feature {0} not found'.format(name)
@@ -225,7 +221,7 @@ def disable_feature(name,
         return ret
 
     ret['changes'] = {'windows_servicing': 'Removed feature {0}'.format(name)}
-    features = get_features(package, image)
+    features = get_features(image)
     if features[name]['State'] == 'Disable Pending':
         ret['pending'] = True
         ret['comment'] = 'Reboot to complete feature {0} removal'.format(name)
