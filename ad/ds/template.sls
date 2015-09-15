@@ -17,7 +17,7 @@ ad_ds:
     - name: {{ command|yaml_encode }}
     - creates: {{ ad_ds_settings.DatabasePath|yaml_encode }}
     - require:
-        - win_servermanager: ad_ds
+        - windows_feature: ad_ds
   service.running:
     {% if salt['file.directory_exists'](ad_ds_settings.DatabasePath) %}
     - names: {{ ad_ds_settings.services|yaml }}
