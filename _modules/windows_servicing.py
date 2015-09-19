@@ -11,8 +11,7 @@ def __virtual__():
         return False
 
 def _dism(action,
-          image=None,
-          sources=[]):
+          image=None):
     '''
     Run a DISM servicing command on the given image.
     '''
@@ -20,7 +19,21 @@ def _dism(action,
         '/Image:{0}'.format(image) if image else '/Online',
         action
     )
-    return __salt__['cmd.run'](command, ignore_retcode=True)
+    ret = {'action': action,
+           'image': image,
+           'result': True,
+           'message': ''}
+    output = __salt__['cmd.run'](command, ignore_retcode=True)
+    if not re.search('The operation completed successfully.', output):
+        ret['result'] = False
+        ret['message'] = re.search(
+            '(Error: \d+\r?\n\r?\n([^\r\n]+\r?\n)+\r?\nThe DISM log file can be found at [^\r\n]\r?\n)',
+            output,
+            re.MULTILINE
+        ).group(1)
+    else:
+        ret['message'] = output
+    return ret
 
 def get_packages(image=None):
     '''
@@ -34,14 +47,15 @@ def get_packages(image=None):
 
         salt -G os:Windows windows_servicing.get_packages
     '''
-    output = _dism('/Get-Packages', image)
-    if not re.search('The operation completed successfully.', output):
+    dism = _dism('/Get-Packages', image)
+    if not dism['result']:
+        ## TODO: log the error message
         return {}
 
     return {p: {'State': s, 'Release Type': r, 'Install Time': t}
             for p, s, r, t
             in re.findall('Package Identity : ([^\r\n]+)\r?\nState : ([^\r\n]+)\r?\nRelease Type : ([^\r\n]+)\r?\nInstall Time : ([^\r?\n]+)\r?\n',
-                          output, re.MULTILINE)}
+                          dism['message'], re.MULTILINE)}
 
 def get_features(image=None,
                  package=None):
@@ -57,17 +71,19 @@ def get_features(image=None,
 
         salt -G os:Windows windows_servicing.get_features
     '''
-    if package:
-        output = _dism('/Get-Features /PackageName:{0}'.format(package), image)
-    else:
-        output = _dism('/Get-Features', image)
-    if not re.search('The operation completed successfully.', output):
+    dism = _dism(
+        '/Get-Features {0}'.format(
+            '/PackageName:{0}'.format(package) if package else ''
+        ),
+        image)
+    if not dism['result']:
+        ## TODO: log the error message
         return {}
 
     return {f: {'State': s}
             for f, s
             in re.findall('Feature Name : ([^\r\n]+)\r?\nState : ([^\r\n]+)\r?\n',
-                          output, re.MULTILINE)}
+                          dism['message'], re.MULTILINE)}
 
 def enable_feature(name,
                    image=None,
@@ -123,9 +139,7 @@ def enable_feature(name,
     ret = {'name': name,
            'result': True,
            'changes': {},
-           'comment': '',
-           'pending': False,
-           'dism': ''}
+           'comment': ''}
     features = get_features(image, package)
     if name not in features:
         ret['result'] = False
@@ -139,18 +153,18 @@ def enable_feature(name,
         ret['comment'] = 'Feature {0} already installed (pending a reboot)'.format(name)
         return ret
 
-    output = _dism('/Enable-Feature /FeatureName:{0} {1} {2} /NoRestart'.format(
+    dism = _dism('/Enable-Feature /FeatureName:{0} {1} {2} /NoRestart'.format(
         name,
         '/PackageName:{0}'.format(package) if package else '',
         ' '.join(['/Source:{0}'.format(source) for source in sources])),
                    image)
-    if not re.search('The operation completed successfully.', output):
+    if not dism['result']:
         ret['result'] = False
         ret['comment'] = 'Feature {0} installation failed'.format(name)
-        ret['dism'] = output
+        ret['message'] = dism['message']
         return ret
 
-    ret['changes'] = {'windows_servicing': 'Installed feature {0}'.format(name)}
+    ret['changes'] = {'windows_feature': 'Installed feature {0}'.format(name)}
     features = get_features(image, package)
     if features[name]['State'] == 'Enable Pending':
         ret['pending'] = True
@@ -197,9 +211,7 @@ def disable_feature(name,
     ret = {'name': name,
            'result': True,
            'changes': {},
-           'comment': '',
-           'pending': False,
-           'dism': ''}
+           'comment': ''}
     features = get_features(image)
     if name not in features:
         ret['result'] = False
@@ -213,14 +225,14 @@ def disable_feature(name,
         ret['comment'] = 'Feature {0} already removed (pending a reboot)'.format(name)
         return ret
 
-    output = _dism('/Disable-Feature /FeatureName:{0} /NoRestart'.format(name), image)
-    if not re.search('The operation completed successfully.', output):
+    dism = _dism('/Disable-Feature /FeatureName:{0} /NoRestart'.format(name), image)
+    if not dism['result']:
         ret['result'] = False
         ret['comment'] = 'Feature {0} removal failed'.format(name)
-        ret['dism'] = output
+        ret['message'] = dism['message']
         return ret
 
-    ret['changes'] = {'windows_servicing': 'Removed feature {0}'.format(name)}
+    ret['changes'] = {'windows_feature': 'Removed feature {0}'.format(name)}
     features = get_features(image)
     if features[name]['State'] == 'Disable Pending':
         ret['pending'] = True
