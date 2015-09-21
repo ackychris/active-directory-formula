@@ -1,5 +1,15 @@
+# -*- coding: utf-8 -*-
 from __future__ import absolute_import
+
+## Import Python libraries
 import re
+import logging
+
+## Import Salt libraries
+import salt.exceptions
+import salt.log
+
+log = logging.getLogger(__name__)
 
 def __virtual__():
     '''
@@ -31,8 +41,10 @@ def _dism(action,
             output,
             re.MULTILINE
         ).group(1)
+        log.exception('DISM command \'{0}\' on image {1} failed: {2}'.format(action, image, ret['message']))
     else:
         ret['message'] = output
+        log.debug('DISM command \'{0}\' on image {1} completed with the following output: {2}'.format(action, image, output))
     return ret
 
 def get_packages(image=None):
@@ -49,7 +61,6 @@ def get_packages(image=None):
     '''
     dism = _dism('/Get-Packages', image)
     if not dism['result']:
-        ## TODO: log the error message
         return {}
 
     return {p: {'State': s, 'Release Type': r, 'Install Time': t}
@@ -77,7 +88,6 @@ def get_features(image=None,
         ),
         image)
     if not dism['result']:
-        ## TODO: log the error message
         return {}
 
     return {f: {'State': s}
