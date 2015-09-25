@@ -2,6 +2,7 @@
 from __future__ import absolute_import
 import logging
 import os
+import platform
 import salt.utils
 
 log = logging.getLogger(__name__)
@@ -27,16 +28,15 @@ def windows_installation_type():
     with salt.utils.winapi.Com():
         wmi_c = wmi.WMI()
         osinfo = wmi_c.Win32_OperatingSystem()[0]
-        if osinfo.ProductType > 1:
-            ## A simple hack---"%windir%\explorer.exe" does not exist on
-            ## Server Core.  This will need to be revised with the release
-            ## of vNext Server, which adds a "Nano Server" install type
-            ## that lacks a user interface of any kind whatsoever.
-            if os.path.isfile(
-                    os.sep.join(
-                        [os.environ['windir'],
-                         "explorer.exe"])):
-                grains['osinstalltype'] = 'Standard'
-            else:
-                grains['osinstalltype'] = 'Server Core'
+
+        ## This only applies to server-based operating systems.
+        if osinfo.ProductType < 2:
+            return {}
+
+        ## A simple hack---"%windir%\explorer.exe" does not exist on
+        ## Server Core.  This will need to be revised with the release
+        ## of vNext Server, which adds a "Nano Server" install type
+        ## that lacks a user interface of any kind whatsoever.
+        if not os.path.isfile(os.sep.join([os.environ['windir'], "explorer.exe"])):
+            grains['osrelease'] = platform.uname()[2] + 'Core'
     return grains
