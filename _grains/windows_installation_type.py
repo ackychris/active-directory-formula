@@ -23,21 +23,20 @@ def windows_installation_type():
     if not HAS_WMI:
         return {}
 
+    grains = {}
     with salt.utils.winapi.Com():
         wmi_c = wmi.WMI()
         osinfo = wmi_c.Win32_OperatingSystem()[0]
-
-    grains = {}
-    if osinfo.ProductType > 1:
-        ## A simple hack---"%windir%\explorer.exe" does not exist on
-        ## Server Core.  This will need to be revised with the release
-        ## of vNext Server, which adds a "Nano Server" install type
-        ## that lacks a user interface of any kind whatsoever.
-        if os.path.isfile(
-                os.sep.join(
-                    [os.environ['windir'],
-                     "explorer.exe"])):
-            grains['osinstalltype'] = 'Standard'
-        else:
-            grains['osinstalltype'] = 'Server Core'
+        if osinfo.ProductType > 1:
+            ## A simple hack---"%windir%\explorer.exe" does not exist on
+            ## Server Core.  This will need to be revised with the release
+            ## of vNext Server, which adds a "Nano Server" install type
+            ## that lacks a user interface of any kind whatsoever.
+            if os.path.isfile(
+                    os.sep.join(
+                        [os.environ['windir'],
+                         "explorer.exe"])):
+                grains['osinstalltype'] = 'Standard'
+            else:
+                grains['osinstalltype'] = 'Server Core'
     return grains
