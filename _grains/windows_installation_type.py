@@ -37,9 +37,8 @@ def windows_installation_type():
             return {}
 
         ## A simple hack---"%windir%\explorer.exe" does not exist on
-        ## Server Core.  This will need to be revised with the release
-        ## of vNext Server, which adds a "Nano Server" install type
-        ## that lacks a user interface of any kind whatsoever.
+        ## Server Core.  This must be revised with the release of
+        ## vNext Server, which adds a "Nano Server" install type.
         if not os.path.isfile(os.sep.join([os.environ['windir'], "explorer.exe"])):
             grains['osinstalltype'] = 'Server Core'
         else:
