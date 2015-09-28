@@ -29,6 +29,10 @@ def windows_installation_type():
         wmi_c = wmi.WMI()
         osinfo = wmi_c.Win32_OperatingSystem()[0]
 
+        ## This only applies to Windows Server 2008 or newer.
+        if int(osinfo.Version.split('.')[0]) < 6:
+            return {}
+
         ## This only applies to server-based operating systems.
         if osinfo.ProductType < 2:
             return {}
