@@ -38,5 +38,7 @@ def windows_installation_type():
         ## of vNext Server, which adds a "Nano Server" install type
         ## that lacks a user interface of any kind whatsoever.
         if not os.path.isfile(os.sep.join([os.environ['windir'], "explorer.exe"])):
-            grains['osrelease'] = platform.uname()[2] + 'Core'
+            grains['osinstalltype'] = 'Server Core'
+        else:
+            grains['osinstalltype'] = 'Standard'
     return grains
