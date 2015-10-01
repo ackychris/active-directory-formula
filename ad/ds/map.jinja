@@ -1,14 +1,26 @@
 {% import_yaml "ad/ds/defaults.yaml" as default_settings %}
 
-{% set os_release_map = salt['grains.filter_by']({
-    '2003Server': {},
-    '2003ServerR2': {},
-    '2008Server': {},
-    '2008ServerR2': {},
-    '2012Server': {},
-    '2012ServerR2': {},
-  }, grain='osrelease', merge=salt['pillar.get']('ad:ds:lookup')) %}
+{% if salt['grains.get']('osrelease') in ['2008Server', '2008ServerR2'] %}
+  {% set os_map = salt['grains.filter_by']({
+      'Server Core':
+        {
+          'features':
+            [
+              'NetFx2-ServerCore',
+              'NetFx3-ServerCore',
+              'DirectoryServices-DomainController-ServerFoundation',
+            ],
+        },
+      'Standard':
+        {
+          'features':
+            [
+              'DirectoryServices-DomainController',
+            ],
+        },
+    }, grain='osinstalltype') %}
+{% endif %}
 
-{% do default_settings.ad.ds.update(os_release_map) %}
+{% do default_settings.ad.ds.update(os_map) if os_map is defined %}
 
 {% set ad_ds_settings = salt['pillar.get']('ad:ds', default=default_settings.ad.ds, merge=True) %}

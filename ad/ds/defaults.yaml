@@ -5,7 +5,7 @@ ad:
     packages:
       []
     features:
-      - AD-Domain-Services
+      []
     services:
       - NTDS
       - kdc
