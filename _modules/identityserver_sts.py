@@ -21,7 +21,7 @@ def __virtual__():
     if __grains__['os_family'] == 'Windows' and \
        __grains__['osrelease'] in ['2008Server', '2008ServerR2', \
                                    '2012Server', '2012ServerR2']:
-        ## Get the list of available cmdlets at module load-time.
+        ## Get the list of available cmdlets at runtime.
         cmdlets = _pswrapper('Get-Help ADFS | Where-Object { $_.Category -eq \'Cmdlet\' } | Select Name,Synopsis | Sort Name')
 
         ## This generates Python functions for each of the AD FS cmdlets
