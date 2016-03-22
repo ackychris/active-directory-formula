@@ -1,17 +1,10 @@
 {% import_yaml "wins/defaults.yaml" as default_settings %}
 
 {% set os_release_map = salt['grains.filter_by']({
-    '2008ServerR2':
-      {
-        'features':
-          [
-            'WINS-Server',
-            'RSAT-WINS',
-          ],
-      },
-    '2012Server': {},
+    '2008ServerR2': { 'features': [ 'WINS-Server', 'RSAT-WINS', ], },
+    '2012Server':   {},
     '2012ServerR2': {},
-  }, grains='osrelease', merge=salt['pillar.get']('wins:lookup')) %}
+  }, grains='osrelease') %}
 
 {% do default_settings.wins.update(os_release_map) %}
 
